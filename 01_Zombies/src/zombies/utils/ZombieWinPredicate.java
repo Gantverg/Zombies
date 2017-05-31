@@ -9,7 +9,13 @@ public class ZombieWinPredicate implements Predicate<Zombie> {
 
 	@Override
 	public boolean test(Zombie zombie) {
-		return (zombie.getX() == Game.MAX_POSITION);
+		if (zombie.getX() == Game.MAX_POSITION)
+			return true;
+		if (zombie.patronus != null){
+			Predicate<Zombie> predicate = new ZombieWinPredicate();
+			return predicate.test(zombie.patronus);
+		}
+		return false;
 	}
 
 }

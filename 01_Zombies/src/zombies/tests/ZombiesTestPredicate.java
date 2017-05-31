@@ -54,7 +54,7 @@ public class ZombiesTestPredicate {
 		assertEquals(9, zombie1_1.getHealth());
 		assertEquals(10, zombie1_2.getHealth());
 	}
-	
+
 	@Test
 	public void testAttackArrow() {
 		game = new Game();
