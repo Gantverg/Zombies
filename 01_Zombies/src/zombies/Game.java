@@ -1,12 +1,11 @@
 package zombies;
 
+import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import tel_ran.collections.Array;
-import zombies.utils.AttackArrowPredicate;
-import zombies.utils.ZombieAttackFirstPredicate;
-import zombies.utils.ZombieLivePredicate;
-import zombies.utils.ZombieWinPredicate;
+import zombies.utils.*;
 
 public class Game {
 	public static final int MAX_POSITION = 10;
@@ -50,7 +49,7 @@ public class Game {
 	}
 
 	private Zombie attakFirstWithPatronus(Zombie zombie, Predicate<Zombie> isZombieAttackFirst) {
-		if(isZombieAttackFirst.test(zombie))
+		if (isZombieAttackFirst.test(zombie))
 			return zombie;
 		if (zombie.patronus != null) {
 			return attakFirstWithPatronus(zombie.patronus, isZombieAttackFirst);
@@ -66,7 +65,7 @@ public class Game {
 
 		for (Zombie zombie : zombies) {
 			Zombie zombieToAttackWithPatronus = findAttackArrowWithPatronus(zombie, isAttackArrow);
-			if (zombieToAttackWithPatronus != null){
+			if (zombieToAttackWithPatronus != null) {
 				int currentX = zombieToAttackWithPatronus.getX();
 				if (currentX > maxX) {
 					maxX = currentX;
@@ -87,9 +86,9 @@ public class Game {
 			maxX = zombie.getX();
 			res = zombie;
 		}
-		if (zombie.patronus != null){
+		if (zombie.patronus != null) {
 			Zombie zombieWithPatronus = findAttackArrowWithPatronus(zombie.patronus, isAttackArrow);
-			if(zombieWithPatronus.getX() > maxX){
+			if (zombieWithPatronus.getX() > maxX) {
 				res = zombieWithPatronus;
 			}
 		}
@@ -99,7 +98,7 @@ public class Game {
 	public Zombie findFirst(Predicate<Zombie> predicate) {
 		for (Zombie zombie : zombies) {
 			Zombie subZombie = findFirstZombieWithPatronus(zombie, predicate);
-			if(subZombie != null)
+			if (subZombie != null)
 				return subZombie;
 		}
 		return null;
@@ -108,9 +107,44 @@ public class Game {
 	private Zombie findFirstZombieWithPatronus(Zombie zombie, Predicate<Zombie> predicate) {
 		if (predicate.test(zombie))
 			return zombie;
-		if(zombie.patronus != null) {
+		if (zombie.patronus != null) {
 			return findFirstZombieWithPatronus(zombie.patronus, predicate);
 		}
 		return null;
+	}
+
+	public void moveStep() {
+		apply(zombies.iterator(), new Consumer<Zombie>() {
+			@Override
+			public void accept(Zombie zombie) {
+				int x = zombie.getX();
+				if(x < MAX_POSITION) {
+					zombie.setX(++x);
+				}
+			}
+		});
+	}
+
+	public void asidingBomb(int x, int y, int r) {
+		apply(new PredicateIterator(zombies, new BombPredicate(x,y,r)), new AsidingConsumer());
+	}
+	
+	public void asidingRay(int y) {
+		apply(new PredicateIterator(zombies, new RayPredicate(y)), new AsidingConsumer());
+	}
+	
+	public void finishingBomb(int x, int y, int r) {
+		apply(new PredicateIterator(zombies, new BombPredicate(x,y,r)), new FinishingConsumer());
+	}
+
+	public void finishingRay(int y) {
+		apply(new PredicateIterator(zombies, new RayPredicate(y)), new FinishingConsumer());
+	}
+	
+	void apply(Iterator<Zombie> iterator, Consumer<Zombie> action) {
+		while(iterator.hasNext()) {
+			Zombie zombie = iterator.next();
+			action.accept(zombie);
+		}
 	}
 }

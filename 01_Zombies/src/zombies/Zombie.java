@@ -4,11 +4,12 @@ public class Zombie {
 	private int x, y;
 	private int health;
 	public Zombie patronus;
+	public static final int MAX_LIFE = 10;
 
 	public Zombie(int y) {
 		this.x = 0;
 		this.y = y;
-		this.health = 10;
+		this.health = MAX_LIFE;
 	}
 
 	/**
